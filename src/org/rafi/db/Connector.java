@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.gson.Gson;
+import com.model.Register;
+
 
 
 public class Connector {
@@ -134,8 +137,10 @@ public class Connector {
 		return hMap;
 	}
 
-	public static boolean validateUser( String uname, String password)throws Exception 
+	public static  ArrayList<Register> validateUser( String uname, String password)throws Exception 
 	{
+		
+		ArrayList<Register> login = new ArrayList<Register>();
 		try 
 		{
 			con = establishConnection();
@@ -145,15 +150,24 @@ public class Connector {
 			ResultSet rs = pstmt.executeQuery();
 			if(rs.next())
 			{
+				
+				Register reg = new Register();
+				reg.setUname(rs.getString(1));
+				reg.setPassword(rs.getString(2));
+				login.add(reg);
+				
+				Gson gson = new Gson();
+				System.out.println(gson.toJson(reg));
+				
 				System.out.println("password is "+rs.getString(2)+" username is "+rs.getString(1));
 				if(rs.getString(2).equals(password))
 				{
-					return true;	
+					
 				}
-				return false;
+				
 			}
 			else
-				return false;
+				return login;
 		}
 		catch(SQLException ex)
 		{
@@ -172,7 +186,7 @@ public class Connector {
 				e.printStackTrace();
 			}
 		}
-		return false;
+		return login;
 
 	}
 	public static boolean Ajax( String uname, String password)throws Exception 
